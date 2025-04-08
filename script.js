@@ -1,7 +1,5 @@
-// Array vazio para armazenar os animais cadastrados
 let animals = [];
 
-// Classe Animal
 class Animal {
   constructor(name, breed, age, sex, weight) {
     this.name = name;
@@ -12,7 +10,6 @@ class Animal {
   }
 }
 
-// Buscando os inputs do formulário
 const inputName = document.getElementById("input-name");
 const inputBreed = document.getElementById("input-breed");
 const inputAge = document.getElementById("input-age");
@@ -22,69 +19,67 @@ const btnSave = document.getElementById("btn-save");
 const btnList = document.getElementById("btn-list");
 const animalList = document.getElementById("animal-list");
 
-let editingIndex = -1; // Variável para armazenar o índice do animal que está sendo editado
+let editingIndex = -1;
 
-// Função para salvar um novo animal ou editar um existente
+// Função para salvar ou editar um animal
 btnSave.addEventListener("click", () => {
   const name = inputName.value;
   const breed = inputBreed.value;
-  const age = inputAge.value;
+  const age = parseFloat(inputAge.value);
   const sex = inputSex.value;
-  const weight = inputWeight.value;
+  const weight = parseFloat(inputWeight.value);
 
-  if (name && breed && age && sex && weight) {
+  if (name && breed && age > 0 && sex && weight > 0) {
     if (editingIndex === -1) {
-      // Se não estiver editando, adiciona um novo animal
       const animal = new Animal(name, breed, age, sex, weight);
       animals.push(animal);
       alert("Animal cadastrado com sucesso!");
     } else {
-      // Se estiver editando, atualiza o animal existente
       animals[editingIndex] = new Animal(name, breed, age, sex, weight);
       alert("Animal editado com sucesso!");
-      editingIndex = -1; // Limpa o índice de edição após salvar
+      editingIndex = -1;
     }
 
     clearInputs();
     displayAnimals();
   } else {
-    alert("Por favor, preencha todos os campos.");
+    alert("Por favor, preencha todos os campos corretamente.");
   }
 });
 
-// Função para listar os animais cadastrados
-btnList.addEventListener("click", () => {
-  displayAnimals();
-});
-
-// Função para exibir a lista de animais
+// Função para exibir todos os animais
 function displayAnimals() {
   animalList.innerHTML = ""; // Limpa a lista antes de exibir
 
   if (animals.length === 0) {
-    // Exibe mensagem caso não haja animais cadastrados
-    const message = document.createElement("li");
-    message.textContent = "Nenhum animal cadastrado.";
-    animalList.appendChild(message);
-  } else {
-    animals.forEach((animal, index) => {
-      const li = document.createElement("li");
-      li.classList.add("animal-item");
-
-      li.innerHTML = `
-        <span><strong>Nome:</strong> ${animal.name}</span>
-        <span><strong>Raça:</strong> ${animal.breed}</span>
-        <span><strong>Idade:</strong> ${animal.age}</span>
-        <span><strong>Sexo:</strong> ${animal.sex}</span>
-        <span><strong>Peso:</strong> ${animal.weight}</span>
-        <button onclick="editAnimal(${index})">Editar</button>
-        <button onclick="deleteAnimal(${index})">Deletar</button>
-      `;
-      
-      animalList.appendChild(li);
-    });
+    const noAnimalsMessage = document.createElement("li");
+    noAnimalsMessage.textContent = "Nenhum animal cadastrado.";
+    animalList.appendChild(noAnimalsMessage);
+    return;
   }
+
+  animals.forEach((animal, index) => {
+    const li = document.createElement("li");
+    li.classList.add("animal-item");
+
+    li.innerHTML = `
+      <span><strong>Nome:</strong> ${animal.name}</span>
+      <span><strong>Raça:</strong> ${animal.breed}</span>
+      <span><strong>Idade:</strong> ${animal.age}</span>
+      <span><strong>Sexo:</strong> ${animal.sex}</span>
+      <span><strong>Peso:</strong> ${animal.weight}</span>
+      <button onclick="editAnimal(${index})">Editar</button>
+      <button onclick="deleteAnimal(${index})">Deletar</button>
+    `;
+    
+    animalList.appendChild(li);
+  });
 }
+
+// Ao clicar no botão "Listar Animais", chama a função para exibir a lista
+btnList.addEventListener("click", () => {
+  displayAnimals(); // Exibe a lista de animais
+});
 
 // Função para editar um animal
 function editAnimal(index) {
@@ -96,8 +91,7 @@ function editAnimal(index) {
   inputSex.value = animal.sex;
   inputWeight.value = animal.weight;
 
-  // Alterando a ação do botão de salvar para editar
-  editingIndex = index; // Armazenando o índice do animal que será editado
+  editingIndex = index;
   btnSave.textContent = "Salvar Edição";
 }
 
@@ -105,16 +99,17 @@ function editAnimal(index) {
 function deleteAnimal(index) {
   if (confirm("Tem certeza que deseja excluir este animal?")) {
     animals.splice(index, 1);
-    displayAnimals();
+    clearInputs(); // Limpa os campos de entrada
+    displayAnimals(); // Atualiza a lista
   }
 }
 
-// Função para limpar os inputs após salvar ou editar
+// Função para limpar os inputs
 function clearInputs() {
   inputName.value = '';
   inputBreed.value = '';
   inputAge.value = '';
   inputSex.value = '';
   inputWeight.value = '';
-  btnSave.textContent = "Salvar Animal"; // Restaura o texto do botão
+  btnSave.textContent = "Salvar Animal"; 
 }
